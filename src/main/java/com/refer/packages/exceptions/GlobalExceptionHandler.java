@@ -48,6 +48,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
+    @ExceptionHandler(SameCompanyException.class)
+    public ResponseEntity<ErrorDetails> sameCompanyException(SameCompanyException sameCompanyException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(sameCompanyException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+    
+    @ExceptionHandler(UnauthorizedUserException.class)
+    public ResponseEntity<ErrorDetails> unauthorizedUserException(UnauthorizedUserException unauthorizedUserException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(unauthorizedUserException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {
         ProblemDetail errorDetail = null;

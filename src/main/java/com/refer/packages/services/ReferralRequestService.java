@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.refer.packages.DTO.ReferralRequestDTO;
+import com.refer.packages.DTO.interfaces.IReferralRequestByCandidateId;
 import com.refer.packages.DTO.interfaces.IReferralRequestByEmployeeId;
 import com.refer.packages.DTO.interfaces.IReferralRequestService;
 import com.refer.packages.exceptions.CompanyNotFoundException;
@@ -16,6 +17,7 @@ import com.refer.packages.exceptions.DuplicateReferralException;
 import com.refer.packages.exceptions.DuplicateUserException;
 import com.refer.packages.exceptions.UnauthorizedUserException;
 import com.refer.packages.exceptions.ReferralNotFoundException;
+import com.refer.packages.exceptions.SameCompanyException;
 import com.refer.packages.exceptions.UserCVNotFoundException;
 import com.refer.packages.exceptions.UserNotFoundException;
 import com.refer.packages.models.CandidateReferralRequest;
@@ -52,9 +54,7 @@ public class ReferralRequestService implements IReferralRequestService {
 
     // Raise referral request directly to employee
     @Override
-    public void raiseReferralRequest(ReferralRequestDTO referralRequestDTO, int employeeId) throws UserNotFoundException, CompanyNotFoundException, UserCVNotFoundException, ReferralNotFoundException, DuplicateReferralException {
-        
-        // TODO - check company of user and employee 
+    public void raiseReferralRequest(ReferralRequestDTO referralRequestDTO, int employeeId) throws UserNotFoundException, CompanyNotFoundException, UserCVNotFoundException, ReferralNotFoundException, DuplicateReferralException, SameCompanyException {
 
         // check employeeId should not be same as user id
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -88,6 +88,12 @@ public class ReferralRequestService implements IReferralRequestService {
         Optional<UserCV> userCV = userCVRepository.findById(referralRequestDTO.getCvId());
         if (userCV.isEmpty()) {
             throw new UserCVNotFoundException("CV not found");
+        }
+
+        // company of user and employee should not be same
+        int companyId = candidate.get().getCompany().getId();
+        if (companyId == referralRequestDTO.getReferredCompanyID()) {
+            throw new SameCompanyException("Cannot referr in same company");
         }
 
         CandidateReferralRequest candidateReferralRequest = CandidateReferralRequest.builder()
@@ -124,10 +130,24 @@ public class ReferralRequestService implements IReferralRequestService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int currentEmployeeID = GeneralUtility.getUserId(authentication);
         if (currentEmployeeID != employeeId) {
-            throw new UnauthorizedUserException("Not a valid employee to reterive data");
+            throw new UnauthorizedUserException("Not a authorized employee");
         }
 
         List<IReferralRequestByEmployeeId> referralRequest = referralRequestRepository.findReferralRequestByEmployeeId(employeeId);
+        return referralRequest;
+    }
+
+    @Override
+    public List<IReferralRequestByCandidateId> getReferralRequestByCandidateId(int candidateId) throws UnauthorizedUserException {
+        
+        // check if user's ID matches with provided ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        int currentCandidateId = GeneralUtility.getUserId(authentication);
+        if (currentCandidateId != candidateId) {
+            throw new UnauthorizedUserException("Not a authorized candidate");
+        }
+
+        List<IReferralRequestByCandidateId> referralRequest = referralRequestRepository.findReferralRequestByCandidateId(candidateId);
         return referralRequest;
     }
     

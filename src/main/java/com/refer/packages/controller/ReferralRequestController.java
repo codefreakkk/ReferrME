@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.refer.packages.DTO.ReferralRequestDTO;
+import com.refer.packages.DTO.interfaces.IReferralRequestByCandidateId;
 import com.refer.packages.DTO.interfaces.IReferralRequestByEmployeeId;
 import com.refer.packages.services.ReferralRequestService;
 import com.refer.packages.utils.GenericResponse;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -30,6 +33,12 @@ public class ReferralRequestController {
     @GetMapping(value = "/{employeeId}/employee")
     public ResponseEntity<?> getReferralRequestByEmployeeId(@PathVariable int employeeId) {
         List<IReferralRequestByEmployeeId> referralRequest = referralRequestService.getReferralRequestByEmployeeId(employeeId);
+        return new ResponseEntity<>(referralRequest, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{candidateId}/candidate")
+    public ResponseEntity<?> getReferralRequestByCandidateId(@PathVariable int candidateId) {
+        List<IReferralRequestByCandidateId> referralRequest = referralRequestService.getReferralRequestByCandidateId(candidateId);
         return new ResponseEntity<>(referralRequest, HttpStatus.OK);
     }
 
