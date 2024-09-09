@@ -48,11 +48,11 @@ public class CandidateReferralRequest {
     private Company company;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'CANDIDATE_REFERRAL'")
     private RequestType requestType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'APPROVED'")
     private Status status;
 
     @CreationTimestamp

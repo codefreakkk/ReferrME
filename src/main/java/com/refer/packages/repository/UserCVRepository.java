@@ -7,5 +7,5 @@ import java.util.List;
 
 
 public interface UserCVRepository extends JpaRepository<UserCV, Integer> {
-    public UserCV findById(int cvId); 
+     
 }

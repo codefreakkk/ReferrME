@@ -7,5 +7,5 @@ import java.util.List;
 
 
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
-    public Company findById(int id);
+
 }

@@ -27,13 +27,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CompanyNotFoundException.class)
     public ResponseEntity<ErrorDetails> companyNotFoundEntity(CompanyNotFoundException companyNotFoundException, WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(companyNotFoundException.getMessage(), webRequest.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
     @ExceptionHandler(UserCVNotFoundException.class)
     public ResponseEntity<ErrorDetails> userCVNotFoundException(UserCVNotFoundException userCVNotFoundException, WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(userCVNotFoundException.getMessage(), webRequest.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+    
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorDetails> userNotFoundException(UserNotFoundException userNotFoundException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(userNotFoundException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(DuplicateReferralException.class)
+    public ResponseEntity<ErrorDetails> DuplicateReferralException(DuplicateReferralException duplicateReferralException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(duplicateReferralException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
     @ExceptionHandler(Exception.class)

@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "refferal_details")
+@Table(name = "referral_details")
 public class ReferralDetails {
     
     @Id
@@ -42,6 +42,9 @@ public class ReferralDetails {
 
     @Column
     private String jobUrl;
+
+    @Column
+    private String message;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")

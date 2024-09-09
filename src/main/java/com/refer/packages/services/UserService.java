@@ -1,5 +1,7 @@
 package com.refer.packages.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,10 +10,13 @@ import org.springframework.stereotype.Service;
 
 import com.refer.packages.DTO.LoginDTO;
 import com.refer.packages.DTO.SignupDTO;
+import com.refer.packages.DTO.interfaces.IUserDTO;
 import com.refer.packages.DTO.interfaces.IUserService;
+import com.refer.packages.DTO.response.UserResponse;
 import com.refer.packages.exceptions.CompanyNotFoundException;
 import com.refer.packages.exceptions.DuplicateUserException;
 import com.refer.packages.exceptions.UserCVNotFoundException;
+import com.refer.packages.exceptions.UserNotFoundException;
 import com.refer.packages.models.Company;
 import com.refer.packages.models.User;
 import com.refer.packages.models.UserCV;
@@ -44,23 +49,23 @@ public class UserService implements IUserService {
 
     @Override
     public void signUp(SignupDTO signupDTO) throws DuplicateUserException, CompanyNotFoundException, UserCVNotFoundException {
-        User currentUser = userRepository.findByEmail(signupDTO.getEmail());
-        Company company = companyRepository.findById(signupDTO.getCompanyId());
-        UserCV userCV = userCVRepository.findById(signupDTO.getCvId());
+        User user = userRepository.findByEmail(signupDTO.getEmail());
+        Optional<Company> company = companyRepository.findById(signupDTO.getCompanyId());
+        Optional<UserCV> userCV = userCVRepository.findById(signupDTO.getCvId());
 
-        if (currentUser != null) {
+        if (user != null) {
             throw new DuplicateUserException("Email already in use");
         }
 
-        if (company == null) {
+        if (company.isEmpty()) {
             throw new CompanyNotFoundException("Company not valid");
         }
 
-        if (userCV == null) {
+        if (userCV.isEmpty()) {
             throw new UserCVNotFoundException("CV not found");
         }
 
-        User user = User.builder()
+        User currentUser = User.builder()
                 .name(signupDTO.getName())
                 .email(signupDTO.getEmail())
                 .password(passwordEncoder.encode(signupDTO.getPassword()))
@@ -70,12 +75,12 @@ public class UserService implements IUserService {
                 .professionalTitle(signupDTO.getProfessionalTitle())
                 .bio(signupDTO.getBio())
                 .openToRelocation(signupDTO.getOpenToRelocation())
-                .company(company)
-                .usercv(userCV)
+                .company(company.get())
+                .usercv(userCV.get())
                 .build();
 
         // save user to DB
-        userRepository.save(user);
+        userRepository.save(currentUser);
     }
 
     @Override
@@ -88,4 +93,26 @@ public class UserService implements IUserService {
         return userRepository.findByEmail(loginDTO.getEmail());
     }
     
+    @Override
+    public UserResponse getUserByUserId(int userId) throws UserNotFoundException {
+        IUserDTO user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException("User with id "+ userId +" not found");
+        }
+
+        UserResponse userResponse = UserResponse.builder()
+            .id(user.getId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .phoneNumber(user.getPhone())
+            .experience(user.getExperience())
+            .location(user.getLocation())
+            .professionalTitle(user.getProfessionalTitle())
+            .bio(user.getBio())
+            .openToRelocation(user.getRelocation())
+            .build();
+
+        return userResponse;
+    }
 }
