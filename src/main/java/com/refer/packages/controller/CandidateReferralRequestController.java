@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.refer.packages.DTO.ReferralRequestDTO;
 import com.refer.packages.DTO.interfaces.IReferralRequestByCandidateId;
 import com.refer.packages.DTO.interfaces.IReferralRequestByEmployeeId;
-import com.refer.packages.services.ReferralRequestService;
+import com.refer.packages.services.CandidateReferralRequestService;
 import com.refer.packages.utils.GenericResponse;
 
 import java.util.List;
@@ -18,17 +18,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
 
 @RequestMapping("api/v1/referral/request")
 @RestController
-public class ReferralRequestController {
+public class CandidateReferralRequestController {
 
     @Autowired
-    private ReferralRequestService referralRequestService; 
+    private CandidateReferralRequestService referralRequestService; 
 
     @GetMapping(value = "/{employeeId}/employee")
     public ResponseEntity<?> getReferralRequestByEmployeeId(@PathVariable int employeeId) {

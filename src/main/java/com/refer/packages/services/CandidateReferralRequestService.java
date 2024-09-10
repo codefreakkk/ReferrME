@@ -22,7 +22,7 @@ import com.refer.packages.exceptions.UserCVNotFoundException;
 import com.refer.packages.exceptions.UserNotFoundException;
 import com.refer.packages.models.CandidateReferralRequest;
 import com.refer.packages.models.Company;
-import com.refer.packages.models.ReferralDetails;
+import com.refer.packages.models.CandidateReferralRequestDetails;
 import com.refer.packages.models.User;
 import com.refer.packages.models.UserCV;
 import com.refer.packages.repository.CompanyRepository;
@@ -31,11 +31,9 @@ import com.refer.packages.repository.ReferralRequestRepository;
 import com.refer.packages.repository.UserCVRepository;
 import com.refer.packages.repository.UserRepository;
 import com.refer.packages.utils.GeneralUtility;
-import com.refer.packages.utils.Enums.RequestType;
-import com.refer.packages.utils.Enums.Status;
 
 @Service
-public class ReferralRequestService implements IReferralRequestService {
+public class CandidateReferralRequestService implements IReferralRequestService {
     
     @Autowired
     private ReferralRequestRepository referralRequestRepository;
@@ -100,8 +98,6 @@ public class ReferralRequestService implements IReferralRequestService {
             .candidate(candidate.get())
             .employee(employee.get())
             .company(company.get())
-            .requestType(RequestType.valueOf(referralRequestDTO.getRequestType()))
-            .status(Status.valueOf(referralRequestDTO.getStatus()))
             .build(); 
 
         // save referral request
@@ -113,7 +109,7 @@ public class ReferralRequestService implements IReferralRequestService {
             throw new ReferralNotFoundException("Referral not found");
         }
 
-        ReferralDetails referralDetails = ReferralDetails.builder()
+        CandidateReferralRequestDetails referralDetails = CandidateReferralRequestDetails.builder()
             .candidateReferralRequest(referralRequest.get())
             .userCV(userCV.get())
             .jobUrl(referralRequestDTO.getJobURL())

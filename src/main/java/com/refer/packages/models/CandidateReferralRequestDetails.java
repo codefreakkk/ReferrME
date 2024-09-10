@@ -1,21 +1,19 @@
 package com.refer.packages.models;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.refer.packages.utils.Enums.Status;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,28 +25,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "candidate_referral_request")
-public class CandidateReferralRequest {
+@Table(name = "referral_details")
+public class CandidateReferralRequestDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "candidate_id", referencedColumnName = "id")
-    private User candidate;
+    @JoinColumn(name = "referral_id", referencedColumnName = "id")
+    private CandidateReferralRequest candidateReferralRequest;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", referencedColumnName = "id", columnDefinition = "INT DEFAULT 0")
-    private User employee;
+    @JoinColumn(name = "cv_id", referencedColumnName = "id")
+    private UserCV userCV;
 
-    @ManyToOne
-    @JoinColumn(name = "reffered_company_id", referencedColumnName = "id", columnDefinition = "INT DEFAULT 0")
-    private Company company;
+    @Column
+    private String jobUrl;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'PENDING'")
-    private Status status;
+    @Column
+    private String message;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")

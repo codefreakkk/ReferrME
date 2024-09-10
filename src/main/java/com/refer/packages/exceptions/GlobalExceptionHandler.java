@@ -60,6 +60,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
+    @ExceptionHandler(RaiseReferralRequestException.class)
+    public ResponseEntity<ErrorDetails> raiseReferralRequestException(RaiseReferralRequestException raiseReferralRequestException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(raiseReferralRequestException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {
         ProblemDetail errorDetail = null;

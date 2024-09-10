@@ -14,7 +14,6 @@ public class ReferralRequestDTO {
     private int referredCompanyID;
     private int cvId;
     private String requestType;
-    private String status;
     private String jobURL;
     private String message;
 }
