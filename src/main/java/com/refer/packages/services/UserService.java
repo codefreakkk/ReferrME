@@ -48,10 +48,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void signUp(SignupDTO signupDTO) throws DuplicateUserException, CompanyNotFoundException, UserCVNotFoundException {
+    public void signUp(SignupDTO signupDTO) throws DuplicateUserException, CompanyNotFoundException {
         User user = userRepository.findByEmail(signupDTO.getEmail());
         Optional<Company> company = companyRepository.findById(signupDTO.getCompanyId());
-        Optional<UserCV> userCV = userCVRepository.findById(signupDTO.getCvId());
 
         if (user != null) {
             throw new DuplicateUserException("Email already in use");
@@ -59,10 +58,6 @@ public class UserService implements IUserService {
 
         if (company.isEmpty()) {
             throw new CompanyNotFoundException("Company not valid");
-        }
-
-        if (userCV.isEmpty()) {
-            throw new UserCVNotFoundException("CV not found");
         }
 
         User currentUser = User.builder()
@@ -76,7 +71,6 @@ public class UserService implements IUserService {
                 .bio(signupDTO.getBio())
                 .openToRelocation(signupDTO.getOpenToRelocation())
                 .company(company.get())
-                .usercv(userCV.get())
                 .build();
 
         // save user to DB

@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import com.refer.packages.DTO.interfaces.IMarketplaceReferralRequest;
 import com.refer.packages.DTO.interfaces.IReferralMarketplaceService;
 import com.refer.packages.exceptions.CompanyNotFoundException;
 import com.refer.packages.exceptions.RaiseReferralRequestException;
+import com.refer.packages.exceptions.ReferralNotFoundException;
 import com.refer.packages.exceptions.SameCompanyException;
 import com.refer.packages.models.Company;
 import com.refer.packages.models.MarketplaceReferralRequest;
@@ -67,24 +70,13 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
 
         marketplaceReferralRequestRepostiory.save(marketplaceReferralRequest);
     }
-    
 
-    // service for getting marketplace referral request by id 
-
-    // Query for etting marketplace referral request by id -
-    // SELECT u.id as userId, u.name userName, u.email userEmail, userCompany.company_name as userCompanyName, u.experience userExperience, u.location userLocation,
-    // u.open_to_relocation as openToRelocation, u.phone_number as userPhoneNumber, cv.path as userCVPath, mr.id as marketplaceReferralRequestId,
-    // mr.company_id as referringCompanyId, employeeCompany.company_name as referringCompanyName FROM marketplace_referral_request mr
-    // INNER JOIN user u
-    //     ON mr.candidate_id = u.id
-    // INNER JOIN company userCompany
-    //     ON u.company_id = userCompany.id
-    // INNER JOIN company employeeCompany
-    //     ON mr.company_id = employeeCompany.id
-    // INNER JOIN usercv cv
-    //     ON u.cv_id = cv.id
-    // WHERE mr.id = 2;
-
-    
-
+    @Override
+    public IMarketplaceReferralRequest getMarketplaceReferralRequestById(int referralRequestId) throws ReferralNotFoundException {
+        Optional<IMarketplaceReferralRequest> marketplaceReferralRequest = marketplaceReferralRequestRepostiory.getMarketplaceReferralRequestById(referralRequestId);
+        if (marketplaceReferralRequest.isEmpty()) {
+            throw new ReferralNotFoundException("Marketplace Referral request not found");
+        }
+        return marketplaceReferralRequest.get();
+    }
 }

@@ -66,6 +66,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
+    @ExceptionHandler(ReferralNotFoundException.class)
+    public ResponseEntity<ErrorDetails> referralNotFoundException(ReferralNotFoundException referralNotFoundException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(referralNotFoundException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {
         ProblemDetail errorDetail = null;

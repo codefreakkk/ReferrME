@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.refer.packages.DTO.ReferralRequestDTO;
 import com.refer.packages.DTO.interfaces.IReferralRequestByCandidateId;
 import com.refer.packages.DTO.interfaces.IReferralRequestByEmployeeId;
-import com.refer.packages.DTO.interfaces.IReferralRequestService;
+import com.refer.packages.DTO.interfaces.ICandidateReferralRequestService;
 import com.refer.packages.exceptions.CompanyNotFoundException;
 import com.refer.packages.exceptions.DuplicateReferralException;
 import com.refer.packages.exceptions.DuplicateUserException;
@@ -33,7 +33,7 @@ import com.refer.packages.repository.UserRepository;
 import com.refer.packages.utils.GeneralUtility;
 
 @Service
-public class CandidateReferralRequestService implements IReferralRequestService {
+public class CandidateReferralRequestService implements ICandidateReferralRequestService {
     
     @Autowired
     private ReferralRequestRepository referralRequestRepository;

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class SignupDTO {
     
     private int companyId;
-    private int cvId;
     private String name;
     private String email;
     private String password;
