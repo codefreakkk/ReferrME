@@ -2,6 +2,7 @@ package com.refer.packages.services;
 
 import java.util.Optional;
 
+import com.refer.packages.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,10 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.refer.packages.DTO.interfaces.IMarketplaceReferralRequest;
 import com.refer.packages.DTO.interfaces.IReferralMarketplaceService;
-import com.refer.packages.exceptions.CompanyNotFoundException;
-import com.refer.packages.exceptions.RaiseReferralRequestException;
-import com.refer.packages.exceptions.ReferralNotFoundException;
-import com.refer.packages.exceptions.SameCompanyException;
 import com.refer.packages.models.Company;
 import com.refer.packages.models.MarketplaceReferralRequest;
 import com.refer.packages.models.User;
@@ -35,10 +32,14 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
     private UserRepository userRepository;
 
     @Override
-    public void raiseMarketplaceReferralRequest(int companyId) throws SameCompanyException, RaiseReferralRequestException, CompanyNotFoundException {
+    public void raiseMarketplaceReferralRequest(int companyId) throws SameCompanyException, RaiseReferralRequestException, CompanyNotFoundException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int userId = GeneralUtility.getUserId(authentication);
         Optional<User> user = userRepository.findById(userId);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("Invalid User");
+        }
 
         // check if referral request are out of count
         int referralCountForCurrentMonth = marketplaceReferralRequestRepostiory.getReferralCountForCurrentMonth(userId);

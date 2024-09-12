@@ -42,7 +42,7 @@ public class CandidateReferralRequestController {
     }
 
     @PostMapping(value = "/{employeeId}")
-    public ResponseEntity<?> postMethodName(@PathVariable int employeeId, @RequestBody ReferralRequestDTO referralRequestDTO) {
+    public ResponseEntity<?> raiseReferralRequest(@PathVariable int employeeId, @RequestBody ReferralRequestDTO referralRequestDTO) {
         referralRequestService.raiseReferralRequest(referralRequestDTO, employeeId);
         GenericResponse genericResponse = new GenericResponse("Referral request saved");
         return new ResponseEntity<>(genericResponse, HttpStatus.CREATED);

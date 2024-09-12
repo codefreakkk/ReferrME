@@ -27,7 +27,7 @@ public class MarketplaceReferralController {
     private MarketplaceReferralService referralMarketplaceService;
 
     @GetMapping(value = "/{referralRequestId}")
-    public ResponseEntity<?> getMethodName(@PathVariable int referralRequestId) {
+    public ResponseEntity<?> getMarketplaceReferralRequestById(@PathVariable int referralRequestId) {
         IMarketplaceReferralRequest marketplaceReferralRequest = referralMarketplaceService.getMarketplaceReferralRequestById(referralRequestId);
         return new ResponseEntity<>(marketplaceReferralRequest, HttpStatus.OK);
     }

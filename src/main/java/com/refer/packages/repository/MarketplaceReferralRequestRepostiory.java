@@ -14,7 +14,7 @@ public interface MarketplaceReferralRequestRepostiory extends JpaRepository<Mark
     @Query(value = "SELECT COUNT(*) FROM marketplace_referral_request WHERE candidate_id = :candidateId AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())", nativeQuery = true)
     int getReferralCountForCurrentMonth(@Param("candidateId") int candidateId);
 
-    @Query(value = "SELECT * FROM marketplace_referral_request WHERE candidate_id = :candidateId AND company_id = :companyId", nativeQuery = true)
+    @Query(value = "SELECT * FROM marketplace_referral_request WHERE candidate_id = :candidateId AND referring_company_id = :companyId", nativeQuery = true)
     Optional<MarketplaceReferralRequest> getReferralRequestByCandidateIdAndCompanyId(int candidateId, int companyId);
 
 
