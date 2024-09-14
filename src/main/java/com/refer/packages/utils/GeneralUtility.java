@@ -9,8 +9,7 @@ public class GeneralUtility {
     
     public static int getUserId(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        int userId = ((User) userDetails).getId();
-        return userId;
+        return ((User) userDetails).getId();
     }
 
 }

@@ -25,6 +25,10 @@ public class MarketplaceReferredUsers {
     private int id;
 
     @ManyToOne
+    @JoinColumn(name = "referring_employee_id", referencedColumnName = "id")
+    private User referringEmployee;
+
+    @ManyToOne
     @JoinColumn(name = "marketplace_referral_request_id", referencedColumnName = "id")
     private MarketplaceReferralRequest marketplaceReferralRequest;
 }

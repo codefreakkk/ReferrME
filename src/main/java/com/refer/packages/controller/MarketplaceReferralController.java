@@ -1,5 +1,6 @@
 package com.refer.packages.controller;
 
+import com.refer.packages.DTO.interfaces.IMarketplaceReferredUser;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,16 +40,25 @@ public class MarketplaceReferralController {
     }
 
     @GetMapping(value = "/{candidateId}/candidate")
-    public ResponseEntity<?> getMarketplaceReferralRequestByCandidateId(@PathVariable int candidateId) {
-        List<IMarketplaceReferralRequest> referralRequests = referralMarketplaceService.getAllMarketplaceReferralRequestByCandidateId(candidateId);
-        return new ResponseEntity<>(referralRequests, HttpStatus.OK);
+    public ResponseEntity<?> getMarketplaceReferredRequestByCandidateId(@PathVariable int candidateId) {
+        List<IMarketplaceReferredUser> referredUsers = referralMarketplaceService.getMarketplaceReferredRequestByCandidateId(candidateId);
+        return new ResponseEntity<>(referredUsers, HttpStatus.OK);
     }
+
+    // TODO api for getting marketplace referral request by employeeId
 
     @PostMapping(value = "/{companyId}/referral")
     public ResponseEntity<?> raiseMarketplaceReferralRequest(@PathVariable int companyId) {
         referralMarketplaceService.raiseMarketplaceReferralRequest(companyId);
         GenericResponse genericResponse = new GenericResponse("Market place referral request raised");
         return new ResponseEntity<>(genericResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value =  "/{referralId}/refer")
+    public ResponseEntity<?> referMarketplaceRequest(@PathVariable int referralId) {
+        referralMarketplaceService.referMarketplaceRequest(referralId);
+        GenericResponse genericResponse = new GenericResponse("Marketplace user referred successfully!");
+        return new ResponseEntity<>(genericResponse, HttpStatus.OK);
     }
 
 }

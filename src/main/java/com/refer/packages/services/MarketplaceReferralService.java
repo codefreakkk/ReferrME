@@ -3,7 +3,11 @@ package com.refer.packages.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.refer.packages.DTO.interfaces.IMarketplaceReferredUser;
 import com.refer.packages.exceptions.*;
+import com.refer.packages.models.MarketplaceReferredUsers;
+import com.refer.packages.repository.MarketplaceReferralRequestRepository;
+import com.refer.packages.repository.MarketplaceReferredUsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,7 +19,6 @@ import com.refer.packages.models.Company;
 import com.refer.packages.models.MarketplaceReferralRequest;
 import com.refer.packages.models.User;
 import com.refer.packages.repository.CompanyRepository;
-import com.refer.packages.repository.MarketplaceReferralRequestRepostiory;
 import com.refer.packages.repository.UserRepository;
 import com.refer.packages.utils.GeneralUtility;
 
@@ -24,7 +27,10 @@ import com.refer.packages.utils.GeneralUtility;
 public class MarketplaceReferralService implements IReferralMarketplaceService {
 
     @Autowired
-    private MarketplaceReferralRequestRepostiory marketplaceReferralRequestRepostiory;
+    private MarketplaceReferralRequestRepository marketplaceReferralRequestRepository;
+
+    @Autowired
+    private MarketplaceReferredUsersRepository marketplaceReferredUsersRepository;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -37,7 +43,7 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
         int userId = GeneralUtility.getUserId(authentication);
         Optional<User> user = userRepository.findById(userId);
 
-        if (user.isEmpty() || candidateId != userId) {
+        if (user.isEmpty() || (userId != candidateId)) {
             throw new UserNotFoundException("Invalid User");
         }
     }
@@ -53,13 +59,13 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
         }
 
         // check if referral request are out of count
-        int referralCountForCurrentMonth = marketplaceReferralRequestRepostiory.getReferralCountForCurrentMonth(userId);
+        int referralCountForCurrentMonth = marketplaceReferralRequestRepository.getReferralCountForCurrentMonth(userId);
         if (referralCountForCurrentMonth >= 5) {
             throw new RaiseReferralRequestException("You can only raise 5 referral requests per month");
         }
 
         // check if user has already raised a referral for the company
-        Optional<MarketplaceReferralRequest> referralRequest = marketplaceReferralRequestRepostiory.getReferralRequestByCandidateIdAndCompanyId(userId, companyId);
+        Optional<MarketplaceReferralRequest> referralRequest = marketplaceReferralRequestRepository.getReferralRequestByCandidateIdAndCompanyId(userId, companyId);
         if (referralRequest.isPresent()) {
             throw new RaiseReferralRequestException("Marketplace Referral already raised for this company");
         }
@@ -80,12 +86,12 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
             .company(company.get())
             .build();
 
-        marketplaceReferralRequestRepostiory.save(marketplaceReferralRequest);
+        marketplaceReferralRequestRepository.save(marketplaceReferralRequest);
     }
 
     @Override
     public IMarketplaceReferralRequest getMarketplaceReferralRequestById(int referralRequestId) throws ReferralNotFoundException {
-        Optional<IMarketplaceReferralRequest> marketplaceReferralRequest = marketplaceReferralRequestRepostiory.getMarketplaceReferralRequestById(referralRequestId);
+        Optional<IMarketplaceReferralRequest> marketplaceReferralRequest = marketplaceReferralRequestRepository.getMarketplaceReferralRequestById(referralRequestId);
         if (marketplaceReferralRequest.isEmpty()) {
             throw new ReferralNotFoundException("Marketplace Referral request not found");
         }
@@ -94,7 +100,7 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
 
     @Override
     public List<IMarketplaceReferralRequest> getAllMarketplaceReferralRequests() {
-        List<IMarketplaceReferralRequest> referralRequests = marketplaceReferralRequestRepostiory.getAllMarketplaceReferralRequest();
+        List<IMarketplaceReferralRequest> referralRequests = marketplaceReferralRequestRepository.getAllMarketplaceReferralRequest();
         if (referralRequests.isEmpty()) {
             throw new ReferralNotFoundException("No referral requests found");
         }
@@ -102,18 +108,55 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
     }
 
     @Override
-    public List<IMarketplaceReferralRequest> getAllMarketplaceReferralRequestByCandidateId(int candidateId) throws ReferralNotFoundException, UserNotFoundException {
+    public List<IMarketplaceReferredUser> getMarketplaceReferredRequestByCandidateId(int candidateId) throws ReferralException, UserNotFoundException {
 
         // check if user is valid
-        checkValidUser(candidateId);
+        this.checkValidUser(candidateId);
 
         // get referral request
-        List<IMarketplaceReferralRequest> referralRequests = marketplaceReferralRequestRepostiory.getAllMarketplaceReferralRequestByCandidateId(candidateId);
-        if (referralRequests.isEmpty()) {
-            throw new ReferralNotFoundException("No referral requests found");
+        List<IMarketplaceReferredUser> referredUsers = marketplaceReferralRequestRepository.getAllMarketplaceReferralRequestByCandidateId(candidateId);
+        if (referredUsers.isEmpty()) {
+            throw new ReferralException("No referred user found");
         }
-        return referralRequests;
+        return referredUsers;
+    }
+
+    @Override
+    public void referMarketplaceRequest(int referralId) throws ReferralNotFoundException, ReferralException {
+
+        // check for marketplace request
+        Optional<MarketplaceReferralRequest> marketplaceReferralRequest = marketplaceReferralRequestRepository.findById(referralId);
+        if (marketplaceReferralRequest.isEmpty()) {
+            throw new ReferralNotFoundException("Marketplace Referral request not found");
+        }
+
+        // handle case for user referring himself
+        int employeeId = GeneralUtility.getUserId(SecurityContextHolder.getContext().getAuthentication());
+        if (employeeId == marketplaceReferralRequest.get().getCandidate().getId()) {
+            throw new ReferralException("User cannot refer himself");
+        }
+
+        // check if user is already referred
+        Optional<MarketplaceReferredUsers> referredUsers = marketplaceReferredUsersRepository.getMarketplaceReferralRequestById(referralId);
+        if (referredUsers.isPresent()) {
+            throw new ReferralException("User is already referred");
+        }
+
+        // add the id of employee who is referring user
+        Optional<User> employee = userRepository.findById(employeeId);
+        if (employee.isEmpty()) {
+            throw new UserNotFoundException("Invalid user");
+        }
+
+        MarketplaceReferredUsers marketplaceReferredUsers = MarketplaceReferredUsers.builder()
+                .referringEmployee(employee.get())
+                .marketplaceReferralRequest(marketplaceReferralRequest.get())
+                .build();
+
+        marketplaceReferredUsersRepository.save(marketplaceReferredUsers);
     }
 }
+
+
 
 
