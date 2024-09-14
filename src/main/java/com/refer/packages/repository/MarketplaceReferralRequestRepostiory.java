@@ -1,5 +1,6 @@
 package com.refer.packages.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,9 @@ public interface MarketplaceReferralRequestRepostiory extends JpaRepository<Mark
     @Query(value = "SELECT u.id as userId, u.name userName, u.email userEmail, userCompany.company_name as userCompanyName, u.experience userExperience, u.location userLocation, u.open_to_relocation as openToRelocation, u.phone_number as userPhoneNumber, cv.path as userCVPath, mr.id as marketplaceReferralRequestId, mr.referring_company_id as referringCompanyId, employeeCompany.company_name as referringCompanyName FROM marketplace_referral_request mr INNER JOIN user u ON mr.candidate_id = u.id INNER JOIN company userCompany ON u.company_id = userCompany.id INNER JOIN company employeeCompany ON mr.referring_company_id = employeeCompany.id INNER JOIN usercv cv ON u.cv_id = cv.id WHERE mr.id = :referralRequestId", nativeQuery = true)
     Optional<IMarketplaceReferralRequest> getMarketplaceReferralRequestById(int referralRequestId);
 
+    @Query(value = "SELECT u.id as userId, u.name userName, u.email userEmail, userCompany.company_name as userCompanyName, u.experience userExperience, u.location userLocation, u.open_to_relocation as openToRelocation, u.phone_number as userPhoneNumber, cv.path as userCVPath, mr.id as marketplaceReferralRequestId, mr.referring_company_id as referringCompanyId, employeeCompany.company_name as referringCompanyName FROM marketplace_referral_request mr INNER JOIN user u ON mr.candidate_id = u.id INNER JOIN company userCompany ON u.company_id = userCompany.id INNER JOIN company employeeCompany ON mr.referring_company_id = employeeCompany.id INNER JOIN usercv cv ON u.cv_id = cv.id", nativeQuery = true)
+    List<IMarketplaceReferralRequest> getAllMarketplaceReferralRequest();
+
+    @Query(value = "SELECT u.id as userId, u.name userName, u.email userEmail, userCompany.company_name as userCompanyName, u.experience userExperience, u.location userLocation, u.open_to_relocation as openToRelocation, u.phone_number as userPhoneNumber, cv.path as userCVPath, mr.id as marketplaceReferralRequestId, mr.referring_company_id as referringCompanyId, employeeCompany.company_name as referringCompanyName FROM marketplace_referral_request mr INNER JOIN user u ON mr.candidate_id = u.id INNER JOIN company userCompany ON u.company_id = userCompany.id INNER JOIN company employeeCompany ON mr.referring_company_id = employeeCompany.id INNER JOIN usercv cv ON u.cv_id = cv.id WHERE mr.candidate_id = :candidateId", nativeQuery = true)
+    List<IMarketplaceReferralRequest> getAllMarketplaceReferralRequestByCandidateId(int candidateId);
 }

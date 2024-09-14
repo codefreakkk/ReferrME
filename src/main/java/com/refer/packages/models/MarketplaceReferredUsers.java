@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "marketplace_reffered_users")
+@Table(name = "marketplace_referred_users")
 public class MarketplaceReferredUsers {
     
     @Id
