@@ -1,7 +1,8 @@
 package com.refer.packages.DTO.interfaces;
 
 public interface IReferralRequestByEmployeeId {
-    int getId(); 
+    int getReferralId();
+    int getUserId();
     String getReferralStatus(); 
     String getReferredCompanyName(); 
     String getName();

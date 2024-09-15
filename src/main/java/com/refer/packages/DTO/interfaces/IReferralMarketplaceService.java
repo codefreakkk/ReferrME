@@ -8,4 +8,5 @@ public interface IReferralMarketplaceService {
     public List<IMarketplaceReferralRequest> getAllMarketplaceReferralRequests();
     public List<IMarketplaceReferredUser> getMarketplaceReferredRequestByCandidateId(int candidateId);
     public void referMarketplaceRequest(int employeeId);
+    public List<IMarketplaceReferredUser> getMarketplaceReferredRequestByEmployeeId(int employeeId);
 }

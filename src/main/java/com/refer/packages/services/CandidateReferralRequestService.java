@@ -3,6 +3,8 @@ package com.refer.packages.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.refer.packages.exceptions.*;
+import com.refer.packages.utils.Enums;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,14 +14,6 @@ import com.refer.packages.DTO.ReferralRequestDTO;
 import com.refer.packages.DTO.interfaces.IReferralRequestByCandidateId;
 import com.refer.packages.DTO.interfaces.IReferralRequestByEmployeeId;
 import com.refer.packages.DTO.interfaces.ICandidateReferralRequestService;
-import com.refer.packages.exceptions.CompanyNotFoundException;
-import com.refer.packages.exceptions.DuplicateReferralException;
-import com.refer.packages.exceptions.DuplicateUserException;
-import com.refer.packages.exceptions.UnauthorizedUserException;
-import com.refer.packages.exceptions.ReferralNotFoundException;
-import com.refer.packages.exceptions.SameCompanyException;
-import com.refer.packages.exceptions.UserCVNotFoundException;
-import com.refer.packages.exceptions.UserNotFoundException;
 import com.refer.packages.models.CandidateReferralRequest;
 import com.refer.packages.models.Company;
 import com.refer.packages.models.CandidateReferralRequestDetails;
@@ -58,7 +52,7 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int userId = GeneralUtility.getUserId(authentication);
         if (userId == employeeId) {
-            throw new DuplicateUserException("Employee and user cannot be same");
+            throw new DuplicateUserException("Referring Employee and User cannot be same");
         }
 
         // check if referral request already raised by candidate to employee
@@ -83,7 +77,7 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
             throw new CompanyNotFoundException("Company not found");
         }
 
-        Optional<UserCV> userCV = userCVRepository.findById(referralRequestDTO.getCvId());
+        Optional<UserCV> userCV = userCVRepository.findCVByUserId(referralRequestDTO.getCvId(), userId);
         if (userCV.isEmpty()) {
             throw new UserCVNotFoundException("CV not found");
         }
@@ -91,14 +85,15 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
         // company of user and employee should not be same
         int companyId = candidate.get().getCompany().getId();
         if (companyId == referralRequestDTO.getReferredCompanyID()) {
-            throw new SameCompanyException("Cannot referr in same company");
+            throw new SameCompanyException("Cannot refer in same company");
         }
 
         CandidateReferralRequest candidateReferralRequest = CandidateReferralRequest.builder()
-            .candidate(candidate.get())
-            .employee(employee.get())
-            .company(company.get())
-            .build(); 
+                .candidate(candidate.get())
+                .employee(employee.get())
+                .company(company.get())
+                .status(Enums.Status.PENDING)
+                .build();
 
         // save referral request
         CandidateReferralRequest savedReferralRequest = referralRequestRepository.save(candidateReferralRequest);
@@ -129,8 +124,7 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
             throw new UnauthorizedUserException("Not a authorized employee");
         }
 
-        List<IReferralRequestByEmployeeId> referralRequest = referralRequestRepository.findReferralRequestByEmployeeId(employeeId);
-        return referralRequest;
+        return referralRequestRepository.findReferralRequestByEmployeeId(employeeId);
     }
 
     @Override
@@ -143,8 +137,35 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
             throw new UnauthorizedUserException("Not a authorized candidate");
         }
 
-        List<IReferralRequestByCandidateId> referralRequest = referralRequestRepository.findReferralRequestByCandidateId(candidateId);
-        return referralRequest;
+        return referralRequestRepository.findReferralRequestByCandidateId(candidateId);
     }
-    
+
+    // TODO testing is remaining
+    @Override
+    public void updateReferralStatus(int referralId, String status) throws ReferralNotFoundException, InvalidStatusException {
+
+        // check if referral request exist
+        Optional<CandidateReferralRequest> candidateReferralRequest = referralRequestRepository.findById(referralId);
+        if (candidateReferralRequest.isEmpty()) {
+            throw new ReferralNotFoundException("Referral request not found");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        int candidateId = candidateReferralRequest.get().getCandidate().getId();
+        int currentCandidateId = GeneralUtility.getUserId(authentication);
+        if (currentCandidateId == candidateId) {
+            throw new UnauthorizedUserException("Not a authorized user to update status");
+        }
+
+        // check for valid status
+        if (!status.equals("APPROVED") && !status.equals("DECLINED") && !status.equals("PENDING")) {
+            throw new InvalidStatusException("Not a valid status");
+        }
+
+        // update the status
+        CandidateReferralRequest request = candidateReferralRequest.get();
+        request.setStatus(Enums.Status.valueOf(status));
+        referralRequestRepository.save(request);
+    }
+
 }

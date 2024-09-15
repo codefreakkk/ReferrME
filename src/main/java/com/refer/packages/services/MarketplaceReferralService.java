@@ -38,13 +38,13 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
     @Autowired 
     private UserRepository userRepository;
 
-    private void checkValidUser(int candidateId) throws UserNotFoundException {
+    private void checkValidUser(int id) throws UnauthorizedUserException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int userId = GeneralUtility.getUserId(authentication);
         Optional<User> user = userRepository.findById(userId);
 
-        if (user.isEmpty() || (userId != candidateId)) {
-            throw new UserNotFoundException("Invalid User");
+        if (user.isEmpty() || (userId != id)) {
+            throw new UnauthorizedUserException("Invalid User");
         }
     }
 
@@ -155,8 +155,20 @@ public class MarketplaceReferralService implements IReferralMarketplaceService {
 
         marketplaceReferredUsersRepository.save(marketplaceReferredUsers);
     }
+
+    @Override
+    public List<IMarketplaceReferredUser> getMarketplaceReferredRequestByEmployeeId(int employeeId) throws UnauthorizedUserException {
+
+        // check if employee is valid
+        this.checkValidUser(employeeId);
+
+        // get referral request
+        List<IMarketplaceReferredUser> referredUsers = marketplaceReferralRequestRepository.getAllMarketplaceReferralRequestByEmployeeId(employeeId);
+        if (referredUsers.isEmpty()) {
+            throw new ReferralException("No referred user found");
+        }
+        return referredUsers;
+    }
 }
-
-
 
 

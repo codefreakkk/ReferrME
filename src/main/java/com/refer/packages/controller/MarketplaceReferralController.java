@@ -1,6 +1,7 @@
 package com.refer.packages.controller;
 
 import com.refer.packages.DTO.interfaces.IMarketplaceReferredUser;
+import org.apache.coyote.Response;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +46,11 @@ public class MarketplaceReferralController {
         return new ResponseEntity<>(referredUsers, HttpStatus.OK);
     }
 
-    // TODO api for getting marketplace referral request by employeeId
+    @GetMapping(value = "/{employeeId}/employee")
+    public ResponseEntity<?> getMarketplaceReferredRequestByEmployeeId(@PathVariable int employeeId) {
+        List<IMarketplaceReferredUser> referredUsers = referralMarketplaceService.getMarketplaceReferredRequestByEmployeeId(employeeId);
+        return new ResponseEntity<>(referredUsers, HttpStatus.OK);
+    }
 
     @PostMapping(value = "/{companyId}/referral")
     public ResponseEntity<?> raiseMarketplaceReferralRequest(@PathVariable int companyId) {
