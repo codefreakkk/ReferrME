@@ -3,6 +3,7 @@ package com.refer.packages.DTO.interfaces;
 import java.util.List;
 
 import com.refer.packages.DTO.ReferralRequestDTO;
+import com.refer.packages.models.CandidateReferralRequest;
 import com.refer.packages.utils.Enums;
 
 public interface ICandidateReferralRequestService {

@@ -25,6 +25,15 @@ import java.util.List;
 @RestController
 public class MarketplaceReferralController {
 
+    /**
+     * GET   /referralRequestId/referral
+     * GET   /referral
+     * GET   /candidateId/candidate
+     * GET   /employeeId/employee
+     * POST  /companyId/referral
+     * POST  /referralId/refer
+     */
+
     @Autowired
     private MarketplaceReferralService referralMarketplaceService;
 

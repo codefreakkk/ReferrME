@@ -78,7 +78,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.OK);
     }
 
-    // TODO handle this InvalidStatusException
+    @ExceptionHandler(InvalidStatusException.class)
+    public ResponseEntity<ErrorDetails> referralException(InvalidStatusException invalidStatusException, WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(invalidStatusException.getMessage(), webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.OK);
+    }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {

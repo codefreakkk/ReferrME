@@ -36,9 +36,10 @@ public class CandidateReferralRequestController {
     }
 
     @PutMapping(value = "/{referralId}/status")
-    public ResponseEntity<?> updateReferralStatus(@PathVariable int referralId, @RequestParam String status) {
-        referralRequestService.updateReferralStatus(referralId, status);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public ResponseEntity<?> updateReferralStatus(@PathVariable int referralId, @RequestParam String s) {
+        referralRequestService.updateReferralStatus(referralId, s);
+        GenericResponse genericResponse = new GenericResponse("Referral Status Updated");
+        return new ResponseEntity<>(genericResponse, HttpStatus.OK);
     }
 
     @PostMapping(value = "/{employeeId}")

@@ -150,6 +150,7 @@ public class CandidateReferralRequestService implements ICandidateReferralReques
             throw new ReferralNotFoundException("Referral request not found");
         }
 
+        // check for valid employee to update status
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int candidateId = candidateReferralRequest.get().getCandidate().getId();
         int currentCandidateId = GeneralUtility.getUserId(authentication);
