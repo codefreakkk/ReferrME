@@ -20,4 +20,7 @@ public interface UserCVRepository extends JpaRepository<UserCV, Integer> {
 
     @Query(value = "SELECT id as cvId, path FROM usercv WHERE user_id = :userId", nativeQuery = true)
     List<UserCVResponse> getAllUserCVbyUserId(@Param("userId") int userId);
+
+    @Query(value = "SELECT id as cvId, path FROM usercv WHERE user_id = :userId AND id = :cvId", nativeQuery = true)
+    List<UserCVResponse> getUserCVbyUserIdAndCvId(@Param("cvId") int cvId, @Param("userId") int userId);
 }

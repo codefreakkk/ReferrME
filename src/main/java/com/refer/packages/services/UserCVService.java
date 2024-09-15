@@ -39,7 +39,7 @@ public class UserCVService implements IUserCVService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         int currentUserId = GeneralUtility.getUserId(authentication);
         if (user.get().getId() != currentUserId) {
-            throw new UnauthorizedUserException("Invalid user to add CV");
+            throw new UnauthorizedUserException("Invalid user");
         }
     }
 
@@ -61,13 +61,20 @@ public class UserCVService implements IUserCVService {
     }
 
     @Override
-    public List<UserCVResponse> getAllUserCVbyUserId(int userId) {
+    public List<UserCVResponse> getAllUserCVbyUserId(int userId) throws UserNotFoundException, UnauthorizedUserException {
 
-        // check if user exist
+        // check if user exists and user is authorized
         Optional<User> user = this.checkUserExist(userId);
-
-        // check if user is authorized user
         this.checkAuthorizeUser(user);
         return userCVRepository.getAllUserCVbyUserId(userId);
+    }
+
+    @Override
+    public List<UserCVResponse> getUserCVbyUserIdAndCvId(int cvId, int userId) throws UserNotFoundException, UnauthorizedUserException {
+
+        // check if user exists and user is authorized
+        Optional<User> user = this.checkUserExist(userId);
+        this.checkAuthorizeUser(user);
+        return userCVRepository.getUserCVbyUserIdAndCvId(cvId, userId);
     }
 }
