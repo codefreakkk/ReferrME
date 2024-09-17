@@ -31,6 +31,9 @@ public class Company {
     @Column
     private String companyName;
 
+    @Column
+    private String path;
+
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
     private Date createdAt;
